@@ -1,0 +1,24 @@
+# Python virtual environments
+.venv/
+__pycache__/
+*.pyc
+
+# Local configuration and credentials
+.env
+.env.*
+
+# Jupyter
+.ipynb_checkpoints/
+notebook.ipynb
+
+# Local data
+*.csv
+*.csv.gz
+*.parquet
+
+# Git and development tools
+.git/
+.vscode/
+
+# Documentation
+README.md

@@ -1,100 +1,66 @@
-# NYC Taxi Data Ingestion
+# NYC Taxi Data Ingestion Pipeline
 
-Data Engineering Zoomcamp — Module 01: Docker, PostgreSQL and Data Ingestion.
+**Data Engineering Journey — Module 01: Docker, PostgreSQL & Data Ingestion**
 
-## Overview
+## 1. Overview
 
-This project implements a batch ingestion pipeline that loads NYC Yellow Taxi trip data into PostgreSQL using Python, pandas and SQLAlchemy.
+This project implements a batch ingestion pipeline to load NYC Yellow Taxi trip data into PostgreSQL using Python, pandas and SQLAlchemy.
 
-The project includes:
+The implementation follows the concepts introduced in the [DataTalksClub Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp), with an independent project structure.
 
-- `notebook.ipynb` — exploratory analysis, schema inspection, ingestion and data validation.
-- `ingest_data.py` — reusable, command-line batch ingestion pipeline.
-- `pyproject.toml` and `uv.lock` — dependency management with `uv`.
+The pipeline supports:
 
-## Tech Stack
+- Exploratory data analysis using Jupyter Notebook.
+- Explicit data types and timestamp parsing.
+- Batch ingestion into PostgreSQL.
+- Configurable ingestion through command-line arguments.
+- Environment-based database credentials.
+- Local execution with Python and `uv`.
+- Containerized execution with Docker.
+- Reproducible dependency installation using `uv.lock`.
+- Data validation using SQL.
 
-- Python 3.13
-- pandas
-- PostgreSQL 18
-- SQLAlchemy and psycopg
-- Docker Compose
-- uv
-- Jupyter Notebook (VS Code)
+## 2. Technology Stack
 
-## Dataset
+| Technology | Purpose |
+|---|---|
+| Python 3.13 | Pipeline implementation |
+| pandas 3.1.0 | CSV processing and batch ingestion |
+| SQLAlchemy 2.1.6 | Database connectivity and SQL operations |
+| psycopg 3.3.6 | PostgreSQL driver |
+| PostgreSQL 18 | Data storage |
+| Docker | Containerization |
+| Docker Compose | PostgreSQL service management |
+| uv | Python dependency management |
+| Jupyter Notebook | Data exploration and validation |
+| python-dotenv | Environment configuration |
 
-**NYC Yellow Taxi — January 2021**
+## 3. Project Structure
 
-Source: [DataTalksClub NYC TLC Dataset](https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz)
-
-- 1,369,765 records
-- 18 columns
-- CSV compressed with gzip
-
-## Pipeline
-
-1. Read the compressed CSV in batches of 100,000 rows.
-2. Apply explicit data types and parse timestamp columns.
-3. Connect to PostgreSQL using environment-based credentials.
-4. Replace the target table on the first batch and append subsequent batches.
-5. Log batch sizes and execution times.
-
-The pipeline uses a full-refresh strategy. It is intended for local development and learning, not production use.
-
-## Running Locally
-
-Start the PostgreSQL service from the `03-postgresql` directory:
-
-```powershell
-docker compose up -d
+```text
+01-docker-terraform/
+├── 03-postgresql/
+│   ├── compose.yaml
+│   ├── .env.example
+│   └── .env                  # Local only, not committed
+│
+└── 04-data-ingestion/
+    ├── .dockerignore
+    ├── .python-version
+    ├── Dockerfile
+    ├── Dockerfile.uv
+    ├── README.md
+    ├── ingest_data.py
+    ├── notebook.ipynb
+    ├── pyproject.toml
+    ├── uv.lock
+    └── src/
+        └── 04_data_ingestion/
+            └── __init__.py
 ```
 
-From the `04-data-ingestion` directory, install dependencies:
+## 4. Dataset
 
-```powershell
-uv sync
-```
+**NYC Yellow Taxi Trip Records — January 2021**
 
-The pipeline reads `POSTGRES_PASSWORD` from the existing `../03-postgresql/.env` file.
-
-Run the ingestion:
-
-```powershell
-uv run python ingest_data.py `
-    --url "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz" `
-    --host 127.0.0.1 `
-    --port 5432 `
-    --user root `
-    --db ny_taxi `
-    --table yellow_taxi_data_pipeline
-```
-
-**Warning:** Running this command replaces the target table and reloads the entire dataset.
-
-## Validation Results
-
-| Metric | Result |
-|---|---:|
-| Total records ingested | 1,369,765 |
-| Records with pickup dates in January 2021 | 1,369,741 |
-| Records with pickup dates before January 2021 | 20 |
-| Records with pickup dates after January 2021 | 4 |
-| Missing pickup timestamps | 0 |
-| Negative trip distances | 0 |
-
-The 24 records with pickup dates outside January are preserved during ingestion. Data-quality filtering is left to downstream transformations.
-
-## Current Limitations
-
-- Full refresh rather than incremental ingestion.
-- No primary key or deduplication.
-- The target table is replaced before the full load completes.
-- No automated data-quality tests.
-- Monetary values use floating-point types.
-
-## Next Steps
-
-- Containerize the ingestion pipeline.
-- Orchestrate PostgreSQL and ingestion using Docker Compose.
-- Introduce automated validation and safer loading strategies.
+Source: [DataTalksClub NYC TLC Data](
